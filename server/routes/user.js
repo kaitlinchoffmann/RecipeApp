@@ -2,7 +2,7 @@ const express = require("express")
 const User = require("../models/user")
 const router = express.Router()
 
-router.get('/', (req, res) => {
+router.get('/getAllUsers', (req, res) => {
   try {
     const users = User.getUsers();
     res.send(users)
@@ -11,4 +11,6 @@ router.get('/', (req, res) => {
   }
 })
 
+
+module.exports = router;
 
