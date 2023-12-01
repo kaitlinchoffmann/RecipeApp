@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 
-app.use(express.json());
+app.use(express.json()); // parse JSON bodies
 
 const userRoutes = require('./server/routes/user')
 //route to at least one other entity that is NOT user/customer/etc.

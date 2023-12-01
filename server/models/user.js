@@ -1,23 +1,60 @@
-// contain all User entity database stuff
-// table creation
-const users = [
-  {
-    username: "cathy123",
-    password: "icecream"
-  },
-  {
-    username: "fredfredburger",
-    password: "frozenyogurt"
-  }
-]
+const con = require("./db_connect");
 
-// CRUD functions
-let getUsers = () => users;
+async function createTable() {
+  let sql = `
+    CREATE TABLE IF NOT EXISTS users (
+      UserId INT NOT NULL AUTO_INCREMENT,
+      UserName VARCHAR(25) NOT NULL,
+      Password VARCHAR(255) NOT NULL,
+      Email VARCHAR(255) NOT NULL,
+      CONSTRAINT UserPK PRIMARY KEY(UserId));`
 
-function getUsers2() {
-  return users;
+      await con.query(sql)
 }
 
-// export functions so can utilize them in another
-// file in application
-module.exports = {getUsers, getUsers2}
+createTable()
+
+// CRUD
+// Read - Login User 
+
+// Testing out login function
+// let newUser = {
+//   username: "cathy123",
+//   password: "icecream"
+// }
+
+// login(newUser);
+
+async function login(user) {
+  let userResult = await getUser(user.username)
+  if(!userResult[0]) throw Error("Username not found!!")
+  if(userResult[0].Password != user.password) throw Error("Password Incorrect!!")
+
+  return userResult[0]
+}
+
+// Register (Create) New User
+async function register(user) {
+  let userResult = await getUser(user.username)
+  if(userResult.length > 0) throw Error("Username already in use!!")
+
+  let sql = `
+    INSERT INTO users(UserName, Password, Email)
+    VALUES("${user.username}", "${user.password}", "${user.email}")
+  `
+
+  await con.query(sql)
+  const newUser = await getUser(user.username)
+  return newUser[0]
+}
+
+// Useful functions
+async function getUser(username) {
+  let sql = `
+    SELECT * FROM users 
+    WHERE UserName = "${username}" 
+  `
+  return await con.query(sql)
+}
+
+module.exports = {login, register}
