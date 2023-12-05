@@ -48,6 +48,28 @@ async function register(user) {
   return newUser[0]
 }
 
+// Update - CRUD
+async function editUser(user) {
+  let updatedUser = await getUser(user.username)
+  if(updatedUser.length > 0) throw Error("Username not available!")
+
+  let sql = `UPDATE users
+    SET UserName = "${user.username}"
+    WHERE UserId = ${user.UserId}
+  `
+  await con.query(sql)
+  updatedUser = await getUser(user.username)
+  return updatedUser[0]
+}
+
+// Delete User 
+async function deleteUser(user) {
+  let sql = `DELETE FROM users
+    WHERE UserId = ${user.UserId}
+  `
+  await con.query(sql)
+}
+
 // Useful functions
 async function getUser(username) {
   let sql = `
@@ -57,4 +79,4 @@ async function getUser(username) {
   return await con.query(sql)
 }
 
-module.exports = {login, register}
+module.exports = {login, register, editUser, deleteUser}
