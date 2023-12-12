@@ -1,4 +1,6 @@
 
+import { fetchData, setCurrentUser } from "./main.js"
+
 let loginForm = document.getElementById("login-form")
 if(loginForm) loginForm.addEventListener('submit', login)
 
@@ -13,6 +15,9 @@ function login(e){
   fetchData("/users/login", user, "POST")
   .then(data => {
     if(!data.message) {
+      // add new user to local storage
+      console.log(data)
+      setCurrentUser(data)
       window.location.href = "index.html"
     }
   })
@@ -24,20 +29,34 @@ function login(e){
   })
 }
 
+// REGISTRATION
+let regForm = document.getElementById("register-form")
+if(regForm) regForm.addEventListener("submit", register)
 
-// Fetch method implementation:
-async function fetchData(route = '', data = {}, methodType) {
-  const response = await fetch(`http://localhost:3000${route}`, {
-    method: methodType, // *POST, PUT, DELETE, etc.
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data) 
-  });
-  if(response.ok) {
-    return await response.json(); 
-  } else {
-    throw await response.json();
+function register(e) {
+  e.preventDefault()
+
+  let user = {
+    username: document.getElementById("username").value,
+    password: document.getElementById("pswd").value,
+    email: document.getElementById("email").value
   }
-} 
+
+  fetchData("/users/register", user, "POST")
+  .then(data => {
+    if(!data.message) {
+      setCurrentUser(data)
+      window.location.href = "profile.html"
+    }
+  })
+  .catch(err => {
+    console.log(err)
+    let errorSection = document.querySelector("#register-form .error")
+    errorSection.innerText = err.message
+    document.getElementById("username").value = ""
+    document.getElementById("email").value = ""
+    document.getElementById("pswd").value = ""
+  })
+  
+}
 

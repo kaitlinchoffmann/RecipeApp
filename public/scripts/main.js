@@ -1,40 +1,53 @@
-let postBtn = document.getElementById('post')
-postBtn?.addEventListener('click', getPosts) 
+let nav = document.querySelector("nav")
 
-function getPosts() {
-  fetch('https://jsonplaceholder.typicode.com/posts')
-    .then((response) => response.json())
-    .then((data) => {
-      console.log(data)
-    })
+if(getCurrentUser()) {
+  nav.innerHTML = `
+     <ul>
+        <li><a href="index.html">Recipes</a></li>
+        <li><a href="profile.html">Profile</a></li>
+        <li><a id="logout">Logout</li>
+      </ul>
+  `
+} else {
+  nav.innerHTML = `
+     <ul>
+       <li><a href="index.html">Recipes</a></li>
+       <li><a href="profile.html">Profile</a></li>
+       <li><a href="login.html">Login</a></li>
+       <li><a href="register.html">Sign Up</a></li>
+     </ul>
+  `
 }
 
-let foodBtn = document.getElementById("food")
-if(foodBtn) foodBtn.addEventListener('click', getFood)
+// Fetch method implementation:
+export async function fetchData(route = '', data = {}, methodType) {
+  const response = await fetch(`http://localhost:3000${route}`, {
+    method: methodType, // *POST, PUT, DELETE, etc.
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data) 
+  });
+  if(response.ok) {
+    return await response.json(); 
+  } else {
+    throw await response.json();
+  }
+} 
 
-let foodList = document.getElementById('foodList')
-
-function getFood() {
-    fetch("https://mdn.github.io/learning-area/javascript/apis/fetching-data/can-store/products.json")
-      .then((response) => response.json())
-      .then((data) => {
-        data.forEach(foodItem => {
-          foodList.innerHTML+=
-            `<li>${foodItem.name}</li>`
-        })
-      })
+// LOCAL STORAGE FUNCTIONALITY
+export function setCurrentUser(user) {
+    localStorage.setItem('user', JSON.stringify(user))
 }
 
-let noteForm = document.getElementById("noteForm")
-
-if(noteForm) noteForm.addEventListener("submit", addNote)
-
-function addNote(e) {
-  e.preventDefault()
-  
-  let note = document.getElementById('note').value
-  let noteList = document.getElementById("noteList")
-
-  noteList.innerHTML += `<li>${note}</li>`
-  document.getElementById('note').value=""
+export function getCurrentUser() {
+  return JSON.parse(localStorage.getItem('user'))
 }
+
+export function logout() {
+  localStorage.removeItem('user')
+  window.location.href = "login.html"
+}
+
+let logoutBtn = document.getElementById("logout")
+if(logoutBtn) logoutBtn.addEventListener("click", logout)
